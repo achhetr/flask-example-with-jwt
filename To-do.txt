@@ -1,0 +1,13 @@
+# Create the virtual environment √
+# Create the git repo √
+# Install Flask √
+# Create app.py and the Flask object √
+# Create the database √
+# Install the libraries to establish the connection Flask-database
+# Create a model
+# CLI commands
+# Install marshmallow for schemas
+# Create the schema
+# GET books method
+# GET book method
+# POST book method
