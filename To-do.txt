@@ -6,8 +6,8 @@
 # Install the libraries to establish the connection Flask-database √
 # Create a model √
 # CLI commands √
-# Install marshmallow for schemas
-# Create the schema
-# GET books method
-# GET book method
+# Install marshmallow for schemas √
+# Create the schema √
+# GET books method √
+# GET book method √
 # POST book method

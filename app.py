@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 #CONFIG area
 app = Flask(__name__)
@@ -7,7 +8,10 @@ app = Flask(__name__)
 
 #establish the connection                 dbms                  db_user     pwd    URI      PORT  db_name
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://std2_db_dev:123456@localhost:5432/std2_library_db"
+#database instance with SQLALCHEMY
 db = SQLAlchemy(app)
+#Marshmallow instance
+ma = Marshmallow(app)
 
 #models area
 class Book (db.Model):
@@ -20,6 +24,17 @@ class Book (db.Model):
     genre = db.Column(db.String())
     year = db.Column(db.Integer())
     length = db.Column(db.Integer())
+
+#SCHEMAS area
+class BookSchema(ma.Schema):
+    class Meta:
+        #fields
+        fields = ("book_id", "title", "genre", "year", "length")
+
+#multiple Book schema, to handle a books list
+books_schema = BookSchema(many=True)
+#single Book schema, to handle a books object
+book_schema = BookSchema()
 
 # CLI commands area
 @app.cli.command("create")
@@ -58,3 +73,21 @@ def drop_db():
 @app.route("/")
 def index():
     return "Welcome to Coder Library"
+
+#retrieves the list of all books
+@app.route("/books", methods=["GET"])
+def get_books():
+    # access to the database and get all the books and store them in a list
+    books_list = Book.query.all() # 'SELECT * FROM BOOKS' in ORM language
+    # data stores the book list converted to a readable format thanks to the schema
+    data = books_schema.dump(books_list) #dump
+    return data
+
+#retrieves one book found by book_id
+@app.route("/books/<int:id>", methods=["GET"])
+def get_book(id):
+    book =  Book.query.get(id) # SELECT * FROM BOOKS where book_id = id the parameter  
+    # alternative to get. Filters by any criteria and returns a list. first is to get just one element of that list
+    #book =  Book.query.filter_by(book_id=id).first()
+    #data = book_schema.dump(book) #dump
+    return book_schema.dump(book)
