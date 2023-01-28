@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -90,4 +90,19 @@ def get_book(id):
     # alternative to get. Filters by any criteria and returns a list. first is to get just one element of that list
     #book =  Book.query.filter_by(book_id=id).first()
     #data = book_schema.dump(book) #dump
+    return book_schema.dump(book)
+
+@app.route("/books", methods=["POST"])
+def post_book():
+    # Receive the book fields from the request (imported from flask), use schema to load them
+    book_fields = book_schema.load(request.json)
+    #Accessing to book_fields' keys, we can get its values
+    book = Book(
+        title = book_fields["title"],
+        genre = book_fields["genre"],
+        length = book_fields["length"],
+        year = book_fields["year"]
+    ) 
+    db.session.add(book)
+    db.session.commit()
     return book_schema.dump(book)
