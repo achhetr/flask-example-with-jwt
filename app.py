@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -7,7 +11,7 @@ app = Flask(__name__)
 
 
 #establish the connection                 dbms                  db_user     pwd    URI      PORT  db_name
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://std2_db_dev:123456@localhost:5432/std2_library_db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 #database instance with SQLALCHEMY
 db = SQLAlchemy(app)
 #Marshmallow instance
@@ -106,3 +110,6 @@ def post_book():
     db.session.add(book)
     db.session.commit()
     return book_schema.dump(book)
+
+if __name__ == "__main__":
+    app.run(debug=True)
