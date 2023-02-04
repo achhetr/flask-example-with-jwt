@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, request
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -12,6 +13,7 @@ app = Flask(__name__)
 
 #establish the connection                 dbms                  db_user     pwd    URI      PORT  db_name
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+app.config["JWT_SECRET_KEY"] = os.getenv("ACCESS_TOKEN_SECRET_KEY")
 #database instance with SQLALCHEMY
 db = SQLAlchemy(app)
 #Marshmallow instance
