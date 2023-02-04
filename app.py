@@ -22,50 +22,51 @@ class Book (db.Model):
     # define tablename
     __tablename__ = "books"
     # define the primary key
-    book_id = db.Column(db.Integer(), primary_key = True)
+    id = db.Column(db.Integer(), primary_key = True)
     # more attributes
     title = db.Column(db.String())
     genre = db.Column(db.String())
     year = db.Column(db.Integer())
     length = db.Column(db.Integer())
 
+
+class User (db.Model):
+    # define tablename
+    __tablename__ = "users"
+    # define the primary key
+    id = db.Column(db.Integer(), primary_key = True)
+    # more attributes
+    username = db.Column(db.String(), unique=True)
+    password = db.Column(db.String())
+    role = db.Column(db.String())
+
 #SCHEMAS area
 class BookSchema(ma.Schema):
     class Meta:
         #fields
-        fields = ("book_id", "title", "genre", "year", "length")
+        fields = ("id", "title", "genre", "year", "length")
 
 #multiple Book schema, to handle a books list
 books_schema = BookSchema(many=True)
 #single Book schema, to handle a books object
 book_schema = BookSchema()
 
+
+class UserSchema(ma.Schema):
+    class Meta:
+        #fields
+        fields = ("id", "username", "password", "role")
+
+#multiple Book schema, to handle a books list
+users_schema = UserSchema(many=True)
+#single Book schema, to handle a books object
+user_schema = UserSchema()
+
 # CLI commands area
 @app.cli.command("create")
 def create_db():
     db.create_all()
     print("Tables created")
-
-@app.cli.command("seed")
-def seed_db():
-    # create a book object
-    book1 = Book(
-        title = "Animal Farm",
-        genre = "Satire",
-        year = 1945,
-        length =  130
-    )
-    db.session.add(book1)
-
-    book2 = Book()
-    book2.title = "Dune"
-    book2.genre = "Science fiction"
-    book2.year = 1965
-    book2.length = 530
-    db.session.add(book2)
-
-    db.session.commit()
-    print ("table seeded")
 
 @app.cli.command("drop")
 def drop_db():
@@ -110,6 +111,30 @@ def post_book():
     db.session.add(book)
     db.session.commit()
     return book_schema.dump(book)
+
+#retrieves the list of all users
+@app.route("/users", methods=["GET"])
+def get_users():
+    users = User.query.all()
+    return users_schema.dump(users)
+
+#retrieves one user found by id
+@app.route("/users/<int:id>", methods=["GET"])
+def get_user(id):
+    user =  User.query.get(id)
+    return user_schema.dump(user)
+
+@app.route("/register", methods=["POST"])
+def post_user():
+    user_fields = user_schema.load(request.json) # user_req_schema
+    user = User(
+        username = user_fields["username"],
+        password = user_fields["password"],
+        role = user_fields["role"]
+    ) 
+    db.session.add(user)
+    db.session.commit()
+    return user_schema.dump(user)
 
 if __name__ == "__main__":
     app.run(debug=True)

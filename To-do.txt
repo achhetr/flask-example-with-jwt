@@ -10,4 +10,15 @@
 # Create the schema √
 # GET books method √
 # GET book method √
-# POST book method
+# POST book method √
+
+-------AKASH Extension------
+# user model
+  - add user class
+  - schema response for a user
+# create basic routes for users
+# create a route for signup/ register
+
+
+# create a route for login
+# create a route for logout
